@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel | Canchas Wembley</title>
+  <link rel="stylesheet" href="css/dashboard.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div class="brand">
+        <img src="assets/wembleylogo.webp" alt="Logo Wembley" />
+        <div>
+          <p class="panel-title">Panel de <span id="role-name">Administraci&oacute;n</span></p>
+          <p class="panel-subtitle">Bienvenido, <span id="user-name">Usuario</span></p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <div class="header-weather" id="header-weather">
+          <span class="weather-icon" id="header-weather-icon">☁️</span>
+          <div>
+            <strong id="header-weather-temp">--°C</strong>
+            <small id="header-weather-note">Actualizando...</small>
+          </div>
+        </div>
+        <button class="notification-btn" id="toggle-notifications">
+          <span class="notification-icon">🔔</span>
+          <span class="notification-dot hidden" id="notification-dot"></span>
+        </button>
+        <button id="logout-btn" class="logout-btn">Cerrar sesi&oacute;n</button>
+      </div>
+      <div class="header-dropdown hidden" id="header-notifications">
+        <div class="header-dropdown-card">
+          <div class="header-dropdown-header">
+            <strong>Notificaciones</strong>
+            <button class="ghost-btn" id="close-header-notifications">Cerrar</button>
+          </div>
+          <div class="list" id="header-notifications-list"></div>
+        </div>
+      </div>
+    </header>
+
+    <section class="stats-grid" data-role-view="admin">
+      <article class="stat-card">
+        <div>
+          <p>Total Usuarios</p>
+          <h2 id="stat-users">-</h2>
+          <small>Registrados en el sistema</small>
+        </div>
+        <span class="stat-icon">👥</span>
+      </article>
+      <article class="stat-card">
+        <div>
+          <p>Canchas Activas</p>
+          <h2 id="stat-fields">-</h2>
+          <small>Disponibles para reserva</small>
+        </div>
+        <span class="stat-icon">📍</span>
+      </article>
+      <article class="stat-card">
+        <div>
+          <p>Reservas</p>
+          <h2 id="stat-bookings">-/ -</h2>
+          <small>Confirmadas / Total</small>
+        </div>
+        <span class="stat-icon">📅</span>
+      </article>
+      <article class="stat-card">
+        <div>
+          <p>Ingresos Totales</p>
+          <h2 id="stat-income">$ -</h2>
+          <small>Pagos procesados</small>
+        </div>
+        <span class="stat-icon">💵</span>
+      </article>
+    </section>
+
+    <section class="role-view" data-role-view="admin">
+      <nav class="dashboard-tabs">
+        <button class="tab-button active" data-tab="usuarios">Usuarios</button>
+        <button class="tab-button" data-tab="canchas">Canchas</button>
+        <button class="tab-button" data-tab="reservas">Reservas</button>
+        <button class="tab-button" data-tab="pagos">Pagos</button>
+        <button class="tab-button" data-tab="facturas">Facturas</button>
+        <button class="tab-button" data-tab="tareas">Tareas</button>
+      </nav>
+
+      <section class="tab-panel active" data-tab-panel="usuarios">
+        <header>
+          <h3>Usuarios Registrados</h3>
+          <p>Gesti&oacute;n de todos los usuarios del sistema</p>
+        </header>
+        <button class="pill-btn add-user-btn" id="open-user-creator">Agregar usuario</button>
+        <div class="card user-editor hidden" id="user-creator">
+          <form id="user-create-form">
+            <div class="editor-header">
+              <div>
+                <h4>Nuevo usuario</h4>
+                <p>Completa los datos para registrar una cuenta</p>
+              </div>
+              <button type="button" class="ghost-btn" id="close-user-creator">Cerrar</button>
+            </div>
+            <label>Nombre completo
+              <input type="text" name="nombre" required />
+            </label>
+            <label>Correo
+              <input type="email" name="email" required />
+            </label>
+            <label>Contraseña
+              <input type="password" name="password" required />
+            </label>
+            <label>Rol
+              <select name="tipo_usuario">
+                <option value="admin">Administrador</option>
+                <option value="empleado">Empleado</option>
+                <option value="normal" selected>Jugador</option>
+              </select>
+            </label>
+            <button type="submit">Registrar usuario</button>
+          </form>
+        </div>
+        <div class="card user-editor hidden" id="user-editor">
+          <form id="user-edit-form">
+            <div class="editor-header">
+              <div>
+                <h4>Editar usuario</h4>
+                <p id="user-edit-email"></p>
+              </div>
+              <button type="button" class="ghost-btn" id="close-user-editor">Cerrar</button>
+            </div>
+            <input type="hidden" name="id" />
+            <label>Nombre completo
+              <input type="text" name="nombre" required />
+            </label>
+            <label>Correo
+              <input type="email" name="email" required />
+            </label>
+            <label>Rol
+              <select name="tipo_usuario">
+                <option value="admin">Administrador</option>
+                <option value="empleado">Empleado</option>
+                <option value="normal">Jugador</option>
+              </select>
+            </label>
+            <button type="submit">Guardar cambios</button>
+          </form>
+        </div>
+        <div class="list" id="user-list"></div>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="canchas">
+        <header>
+          <h3>Canchas</h3>
+          <p>Disponibilidad y creaci&oacute;n de nuevas canchas</p>
+        </header>
+        <div class="field-manager">
+          <form class="card field-form-card" id="field-form">
+            <label>Nombre de la cancha
+              <input type="text" name="nombre" placeholder="Ej. Cancha Principal" required />
+            </label>
+            <label>Capacidad
+              <select name="capacidad">
+                <option value="5">5 jugadores</option>
+                <option value="7">7 jugadores</option>
+                <option value="11">11 jugadores</option>
+              </select>
+            </label>
+            <label>Tipo de campo
+              <select name="tipo_campo">
+                <option value="sint&eacute;tica">Sint&eacute;tica</option>
+                <option value="natural">Natural</option>
+              </select>
+            </label>
+            <label>Estado
+              <select name="estado">
+                <option value="disponible">Disponible</option>
+                <option value="ocupada">Ocupada</option>
+                <option value="en mantenimiento">En mantenimiento</option>
+              </select>
+            </label>
+            <label>Descripci&oacute;n
+              <textarea name="descripcion" rows="3" placeholder="Detalles de la cancha"></textarea>
+            </label>
+            <label>Imagen
+              <input type="file" id="field-image" accept="image/*" />
+            </label>
+            <div class="image-preview" id="field-image-preview"></div>
+            <button type="submit">Guardar cancha</button>
+          </form>
+          <div class="card field-gallery-card">
+            <header class="field-gallery-header">
+              <div>
+                <h4>Canchas disponibles</h4>
+                <p>Gesti&oacute;n del complejo</p>
+              </div>
+              <div class="field-gallery-summary" id="field-gallery-summary"></div>
+            </header>
+            <div class="field-gallery" id="field-list"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="reservas">
+        <header>
+          <h3>Reservas recientes</h3>
+          <p>Estado de las &uacute;ltimas solicitudes</p>
+        </header>
+        <div class="list" id="reservation-list"></div>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="pagos">
+        <header>
+          <h3>Pagos</h3>
+          <p>Transacciones registradas</p>
+        </header>
+        <div class="payment-grid">
+          <article class="card">
+            <header>
+              <h4>Pagos con tarjeta</h4>
+              <p>Transacciones procesadas con entidades bancarias</p>
+            </header>
+            <div class="list" id="payment-card"></div>
+          </article>
+          <article class="card">
+            <header>
+              <h4>Transferencias</h4>
+              <p>Pagos reportados desde cuentas bancarias</p>
+            </header>
+            <div class="list" id="payment-transfer"></div>
+          </article>
+          <article class="card">
+            <header>
+              <h4>Efectivo</h4>
+              <p>Registros liquidados en sede</p>
+            </header>
+            <div class="list" id="payment-cash"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="facturas">
+        <header>
+          <h3>Facturaci&oacute;n</h3>
+          <p>Historial de facturas emitidas</p>
+        </header>
+        <div class="list" id="invoice-list"></div>
+      </section>
+
+      <section class="tab-panel" data-tab-panel="tareas">
+        <header>
+          <h3>Gestión de tareas de empleados</h3>
+          <p>Asigna y supervisa las actividades del equipo</p>
+        </header>
+        <div class="task-assign-grid">
+          <article class="card">
+            <header>
+              <h4>Nueva tarea</h4>
+              <p>Selecciona un empleado y define la instrucción</p>
+            </header>
+            <form id="task-create-form" class="task-form">
+              <input type="hidden" name="id" id="task-id" />
+              <label>Empleado
+                <select id="task-employee" name="asignado_a"></select>
+              </label>
+              <label>Tarea
+                <select id="task-template"></select>
+              </label>
+              <label>Título
+                <input type="text" name="titulo" id="task-title" required />
+              </label>
+              <label>Descripción
+                <textarea name="descripcion" id="task-description" rows="3"></textarea>
+              </label>
+              <label>Prioridad
+                <select name="prioridad" id="task-priority">
+                  <option value="baja">Baja</option>
+                  <option value="media" selected>Media</option>
+                  <option value="alta">Alta</option>
+                </select>
+              </label>
+              <label>Estado
+                <select name="estado" id="task-status">
+                  <option value="pendiente" selected>Pendiente</option>
+                  <option value="en_progreso">En progreso</option>
+                  <option value="completada">Completada</option>
+                  <option value="cancelada">Cancelada</option>
+                </select>
+              </label>
+              <label>Fecha programada
+                <input type="datetime-local" name="fecha_programada" id="task-date" />
+              </label>
+              <button type="submit">Asignar tarea</button>
+            </form>
+          </article>
+          <article class="card">
+            <header>
+              <h4>Tareas asignadas</h4>
+              <p>Filtra por estado o empleado</p>
+            </header>
+            <div class="task-toolbar">
+              <select id="task-filter-employee"></select>
+              <select id="task-filter-status">
+                <option value="todas">Todos los estados</option>
+                <option value="pendiente">Pendientes</option>
+                <option value="en_progreso">En progreso</option>
+                <option value="completada">Completadas</option>
+                <option value="cancelada">Canceladas</option>
+              </select>
+            </div>
+            <div class=" task-list" id="admin-task-list"></div>
+          </article>
+          <article class="card">
+            <header>
+              <h4>Historial de actualizaciones</h4>
+              <p>Seguimiento de cambios recientes</p>
+            </header>
+            <div class="list" id="admin-task-history"></div>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <section class="role-view hidden" data-role-view="empleado">
+      <nav class="dashboard-tabs employee-tabs">
+        <button class="tab-button active" data-employee-tab="overview">Resumen</button>
+        <button class="tab-button" data-employee-tab="tareas">Tareas</button>
+        <button class="tab-button" data-employee-tab="operaciones">Operaciones</button>
+        <button class="tab-button" data-employee-tab="historial">Historial</button>
+      </nav>
+
+      <section class="tab-panel active" data-employee-panel="overview">
+        <header class="section-header">
+          <h2>Agenda del d&iacute;a</h2>
+          <p>Estado general de tus actividades</p>
+        </header>
+        <div class="employee-stats-grid">
+          <article class="stat-card">
+            <div>
+              <p>Tareas pendientes</p>
+              <h2 id="employee-stat-pending">-</h2>
+              <small>Asignadas a&uacute;n sin iniciar</small>
+            </div>
+            <span class="stat-icon">📝</span>
+          </article>
+          <article class="stat-card">
+            <div>
+              <p>En progreso</p>
+              <h2 id="employee-stat-progress">-</h2>
+              <small>Actualmente en marcha</small>
+            </div>
+            <span class="stat-icon">⚙️</span>
+          </article>
+          <article class="stat-card">
+            <div>
+              <p>Completadas</p>
+              <h2 id="employee-stat-completed">-</h2>
+              <small>Durante la semana</small>
+            </div>
+            <span class="stat-icon">✅</span>
+          </article>
+          <article class="stat-card">
+            <div>
+              <p>Total asignadas</p>
+              <h2 id="employee-stat-total">-</h2>
+              <small>Incluidas finalizadas</small>
+            </div>
+            <span class="stat-icon">📋</span>
+          </article>
+        </div>
+        <div class="employee-overview">
+          <article class="card highlight-card" id="employee-highlight"></article>
+          <article class="card highlight-card" id="employee-notes"></article>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-employee-panel="tareas">
+        <header class="section-header">
+          <h2>Tareas asignadas</h2>
+          <p>Gestiona tu trabajo pendiente y en curso</p>
+        </header>
+        <div class="employee-task-grid">
+          <article class="card">
+            <header>
+              <h3>Pendientes</h3>
+              <p>Tareas que aún no has comenzado</p>
+            </header>
+            <div class="list" id="employee-task-pending"></div>
+          </article>
+          <article class="card">
+            <header>
+              <h3>En progreso</h3>
+              <p>Actividades que estás ejecutando</p>
+            </header>
+            <div class="list" id="employee-task-progress"></div>
+          </article>
+          <article class="card">
+            <header>
+              <h3>Completadas recientes</h3>
+              <p>Últimas tareas que cerraste</p>
+            </header>
+            <div class="list" id="employee-task-completed"></div>
+          </article>
+          <article class="card">
+            <header>
+              <h3>Mantenimiento asignado</h3>
+              <p>Actividades de soporte programadas</p>
+            </header>
+            <div class="list" id="maintenance-list"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-employee-panel="historial">
+        <header class="section-header">
+          <h2>Historial de cambios</h2>
+          <p>Actualizaciones registradas en tus tareas</p>
+        </header>
+        <article class="card">
+          <div class="list" id="employee-task-history"></div>
+        </article>
+      </section>
+
+      <section class="tab-panel" data-employee-panel="operaciones">
+        <header class="section-header">
+          <h2>Operaciones</h2>
+          <p>Gestión de reservas y pagos del día</p>
+        </header>
+        <div class="employee-ops-grid">
+          <article class="card">
+            <header>
+              <h3>Reservas</h3>
+              <p>Confirma o cancela según la disponibilidad</p>
+            </header>
+            <div class="list" id="employee-ops-reservations"></div>
+          </article>
+          <article class="card">
+            <header>
+              <h3>Pagos</h3>
+              <p>Movimientos registrados recientemente</p>
+            </header>
+            <div class="list" id="employee-ops-payments"></div>
+          </article>
+        </div>
+      </section>
+    </section>
+
+    <section class="role-view hidden" data-role-view="normal">
+      <nav class="dashboard-tabs player-tabs">
+        <button class="tab-button active" data-player-tab="overview">Resumen</button>
+        <button class="tab-button" data-player-tab="reservas">Reservas</button>
+        <button class="tab-button" data-player-tab="finanzas">Finanzas</button>
+      </nav>
+
+      <section class="tab-panel active" data-player-panel="overview">
+        <header class="section-header">
+          <h2>Tu experiencia</h2>
+          <p>Resumen general y próximos eventos</p>
+        </header>
+        <div class="player-stats-grid">
+          <article class="stat-card">
+            <div>
+              <p>Reservas totales</p>
+              <h2 id="player-stat-total">-</h2>
+              <small>Historial registrado</small>
+            </div>
+            <span class="stat-icon">📅</span>
+          </article>
+          <article class="stat-card">
+            <div>
+              <p>Próximas reservas</p>
+              <h2 id="player-stat-upcoming">-</h2>
+              <small>Confirmadas pendientes de jugar</small>
+            </div>
+            <span class="stat-icon">⏱️</span>
+          </article>
+          <article class="stat-card">
+            <div>
+              <p>Gasto acumulado</p>
+              <h2 id="player-stat-spent">$ -</h2>
+              <small>Pagos completados</small>
+            </div>
+            <span class="stat-icon">💳</span>
+          </article>
+          <article class="stat-card">
+            <div>
+              <p>Canchas visitadas</p>
+              <h2 id="player-stat-fields">-</h2>
+              <small>Variedad del complejo</small>
+            </div>
+            <span class="stat-icon">📍</span>
+          </article>
+        </div>
+        <div class="player-overview">
+          <article class="card highlight-card" id="next-booking"></article>
+          <article class="card highlight-card" id="player-suggestions"></article>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-player-panel="reservas">
+        <header class="section-header">
+          <h2>Reservas</h2>
+          <p>Gestiona tus canchas y horarios</p>
+        </header>
+        <div class="player-grid">
+          <div class="card">
+            <header>
+              <h3>Canchas disponibles</h3>
+              <p>Selecciona tu favorita para reservar</p>
+            </header>
+            <div class="player-fields" id="player-field-gallery"></div>
+          </div>
+          <form class="card player-reservation-card" id="player-reservation-form">
+            <header>
+              <h3>Reservar cancha</h3>
+              <p>Puedes reservar con una fecha y hora específicas</p>
+            </header>
+            <label>Cancha
+              <select name="id_cancha" id="player-reservation-field"></select>
+            </label>
+            <div class="reservation-price">
+              <strong>Valor de la cancha</strong>
+              <p id="player-reservation-price">$ -</p>
+            </div>
+            <label>Fecha y hora
+              <input type="datetime-local" name="fecha_reserva" required />
+            </label>
+            <label>Método de pago
+              <select name="metodo_pago" id="player-reservation-method">
+                <option value="tarjeta">Tarjeta</option>
+                <option value="transferencia">Transferencia</option>
+                <option value="efectivo">Efectivo</option>
+              </select>
+            </label>
+            <button type="submit">Confirmar reserva</button>
+          </form>
+        </div>
+        <div class="player-reservations-grid">
+          <article class="card">
+            <header>
+              <h3>Reservas próximas</h3>
+              <p>Programadas para jugar</p>
+            </header>
+            <div class="list" id="player-reservations-upcoming"></div>
+          </article>
+          <article class="card">
+            <header>
+              <h3>Historial completo</h3>
+              <p>Todas tus reservas anteriores</p>
+            </header>
+            <div class="list" id="player-reservations-history"></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="tab-panel" data-player-panel="finanzas">
+        <header class="section-header">
+          <h2>Finanzas</h2>
+          <p>Pagos, facturas y gastos</p>
+        </header>
+        <div class="player-finance-grid">
+          <article class="card finance-card">
+            <div class="finance-header">
+              <span class="finance-icon">📊</span>
+              <div>
+                <h3>Gestión de gastos</h3>
+                <p>Distribución por cancha</p>
+              </div>
+            </div>
+            <div class="finance-summary" id="player-expenses-summary"></div>
+            <div class="list" id="player-expenses"></div>
+          </article>
+          <article class="card finance-card">
+            <div class="finance-header">
+              <span class="finance-icon">💳</span>
+              <div>
+                <h3>Pagos</h3>
+                <p>Transacciones registradas</p>
+              </div>
+            </div>
+            <div class="finance-summary" id="player-payments-summary"></div>
+            <div class="list" id="player-payments"></div>
+          </article>
+          <article class="card finance-card">
+            <div class="finance-header">
+              <span class="finance-icon">🧾</span>
+              <div>
+                <h3>Facturas</h3>
+                <p>Detalle de cobros emitidos</p>
+              </div>
+            </div>
+            <div class="finance-summary" id="player-invoices-summary"></div>
+            <div class="list" id="player-invoices"></div>
+          </article>
+          <article class="card finance-card">
+            <div class="finance-header">
+              <span class="finance-icon">🔔</span>
+              <div>
+                <h3>Notificaciones</h3>
+                <p>Novedades recientes</p>
+              </div>
+            </div>
+            <div class="finance-summary" id="player-notifications-summary"></div>
+            <div class="list" id="notifications"></div>
+          </article>
+        </div>
+      </section>
+    </section>
+  </div>
+  <script src="js/dashboard.js"></script>
+</body>
+</html>
